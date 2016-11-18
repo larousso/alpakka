@@ -8,7 +8,7 @@ This project provides a home to Akka Streams connectors to various technologies,
 Documentation
 -------------
 
-Latest [documentation](http://developer.lightbend.com/docs/alpakka/latest/).
+See [Releases](https://github.com/akka/alpakka/releases) page for the reference and API documentation.
 
 Contributions
 -------------
