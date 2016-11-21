@@ -40,4 +40,12 @@ object Dependencies {
       "com.google.jimfs"  %  "jimfs"               % "1.1"  % Test  // ApacheV2
     )
   )
+
+  val Jms = Seq(
+    libraryDependencies ++= Seq(
+      "javax.jms" % "javax.jms-api" % "2.0.1", // GPL 1.1
+      "org.apache.activemq" % "activemq-broker" % "5.14.1" % Test, // ApacheV2
+      "org.apache.activemq" % "activemq-client" % "5.14.1" % Test // ApacheV2
+    )
+  )
 }
