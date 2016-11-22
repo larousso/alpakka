@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape[Message]] {
 
-  val out = Outlet[String]("JmsSource.out")
+  val out = Outlet[Message]("JmsSource.out")
   override def shape: SourceShape[Message] = SourceShape[Message](out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
