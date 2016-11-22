@@ -147,9 +147,8 @@ public class JmsConnectorsTest {
 
     @Test
     public void publishAndConsumeTopic() throws ExecutionException, InterruptedException, TimeoutException {
-        //#connection-factory
+
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61617");
-        //#connection-factory
 
         List<String> in = Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
         List<String> inNumbers = IntStream.range(0, 10).boxed().map(String::valueOf).collect(Collectors.toList());

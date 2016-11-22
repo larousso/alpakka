@@ -41,7 +41,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #connection-factory }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #connection-factory }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #connection-factory }
 
 
 Create a sink, that accepts and forwards @scaladoc[String](java.lang.String)s to the JMS server.
@@ -50,7 +50,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #create-sink }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-sink }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-sink }
 
 @scaladoc[JmsSink](akka.stream.alpakka.jms.JmsSink$) is a collection of factory methods that facilitates creation of sinks.
 
@@ -60,7 +60,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #run-sink }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #run-sink }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #run-sink }
 
 ### Receiving messages from JMS server
 
@@ -70,7 +70,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #create-source }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-source }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-source }
 
 The `bufferSize` parameter controls the maximum number of messages to prefetch before applying backpressure.
 
@@ -80,7 +80,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #run-source }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #run-source }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #run-source }
 
 This is how you send and receive message from JMS server using this connector.
 
@@ -94,7 +94,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #create-topic-sink }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-topic-sink }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-topic-sink }
 
 For the source :
 
@@ -102,7 +102,7 @@ Scala
 : @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/scaladsl/JmsConnectorsSpec.scala) { #create-topic-source }
 
 Java
-: @@snip (../../../../jms/src/test/java/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-topic-source }
+: @@snip (../../../../jms/src/test/scala/akka/stream/alpakka/jms/javadsl/JmsConnectorsTest.java) { #create-topic-source }
 
 Such sink and source can be started the same way as in the previous example.
 
