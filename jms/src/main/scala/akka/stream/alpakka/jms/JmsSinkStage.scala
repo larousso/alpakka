@@ -47,8 +47,7 @@ class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[String]] 
             session <- jmsSession
             producer <- jmsProducer
           } yield {
-            val textMessage: TextMessage = session.createTextMessage()
-            textMessage.setText(elem)
+            val textMessage: TextMessage = session.createTextMessage(elem)
             producer.send(textMessage)
             pull(in)
           }

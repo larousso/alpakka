@@ -81,6 +81,7 @@ class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape
                 log.error(e, "Error creating consumer on queue {}", name)
               case Some(Topic(name)) =>
                 log.error(e, "Error creating consumer on topic {}", name)
+              case _ =>
             }
             failStage(e)
         }

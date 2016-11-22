@@ -19,9 +19,10 @@ abstract class JmsSpec
 
   implicit val system = ActorSystem(this.getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
-  val broker = new BrokerService()
+  var broker: BrokerService = _
 
   override protected def beforeEach(): Unit = {
+    broker = new BrokerService()
     broker.setPersistent(false)
     broker.setBrokerName("localhost")
     broker.setUseJmx(false)
