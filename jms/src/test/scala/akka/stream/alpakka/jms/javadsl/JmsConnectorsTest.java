@@ -5,8 +5,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.jms.JMSException;
 
@@ -55,7 +60,9 @@ public class JmsConnectorsTest {
 
     @After
     public void stopServer() throws Exception {
-        broker.stop();
+        if(broker.isStarted()) {
+            broker.stop();
+        }
     }
 
     @Test
@@ -127,6 +134,7 @@ public class JmsConnectorsTest {
                 .withQueue("test")
                 .withBufferSize(1)
         ).runWith(Sink.seq(), materializer);
+        Thread.sleep(500);
         broker.stop();
         try {
             result.toCompletableFuture().get();
@@ -134,5 +142,64 @@ public class JmsConnectorsTest {
         } catch (ExecutionException e) {
             assertEquals(JMSException.class, e.getCause().getClass());
         }
+    }
+
+
+    @Test
+    public void publishAndConsumeTopic() throws ExecutionException, InterruptedException, TimeoutException {
+        //#connection-factory
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61617");
+        //#connection-factory
+
+        List<String> in = Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
+        List<String> inNumbers = IntStream.range(0, 10).boxed().map(String::valueOf).collect(Collectors.toList());
+
+        //#create-topic-sink
+        Sink<String, NotUsed> jmsTopicSink = JmsSink.create(
+                JmsSinkSettings
+                        .create(connectionFactory)
+                        .withTopic("topic")
+        );
+        //#create-topic-sink
+        Sink<String, NotUsed> jmsTopicSink2 = JmsSink.create(
+                JmsSinkSettings
+                        .create(connectionFactory)
+                        .withTopic("topic")
+        );
+
+        //#create-topic-source
+        Source<String, NotUsed> jmsTopicSource = JmsSource
+                .textSource(JmsSourceSettings
+                        .create(connectionFactory)
+                        .withTopic("topic")
+                        .withBufferSize(10)
+                );
+        //#create-topic-source
+        Source<String, NotUsed> jmsTopicSource2 = JmsSource
+                .textSource(JmsSourceSettings
+                        .create(connectionFactory)
+                        .withTopic("topic")
+                        .withBufferSize(10)
+                );
+
+        //#run-topic-source
+        CompletionStage<List<String>> result = jmsTopicSource
+                .take(in.size() + inNumbers.size())
+                .runWith(Sink.seq(), materializer)
+                .thenApply(l -> l.stream().sorted().collect(Collectors.toList()));
+        //#run-topic-source
+        CompletionStage<List<String>> result2 = jmsTopicSource2
+                .take(in.size() + inNumbers.size())
+                .runWith(Sink.seq(), materializer)
+                .thenApply(l -> l.stream().sorted().collect(Collectors.toList()));
+
+        //#run-topic-sink
+        Source.from(in).runWith(jmsTopicSink, materializer);
+        //#run-topic-sink
+        Source.from(inNumbers).runWith(jmsTopicSink2, materializer);
+
+
+        assertEquals(Stream.concat(in.stream(), inNumbers.stream()).sorted().collect(Collectors.toList()), result.toCompletableFuture().get(3, TimeUnit.SECONDS));
+        assertEquals(Stream.concat(in.stream(), inNumbers.stream()).sorted().collect(Collectors.toList()), result2.toCompletableFuture().get(3, TimeUnit.SECONDS));
     }
 }

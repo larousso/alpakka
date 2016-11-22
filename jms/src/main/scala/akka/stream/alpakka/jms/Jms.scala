@@ -53,6 +53,8 @@ trait JmsConnector  { this: GraphStageLogic with StageLogging =>
 
   def jmsSettings: JmsSettings
 
+  def fail = getAsyncCallback[JMSException](e => failStage(e))
+
   def openQueue(): Unit = {
     val factory: ConnectionFactory = jmsSettings.connectionFactory
     try {
@@ -63,7 +65,7 @@ trait JmsConnector  { this: GraphStageLogic with StageLogging =>
       jmsConnection.foreach(_.setExceptionListener(new ExceptionListener {
         override def onException(exception: JMSException): Unit = {
           log.error(exception, "Error on jms connexion")
-          failStage(exception)
+          fail.invoke(exception)
         }
       }))
       jmsConnection.foreach(_.start)
