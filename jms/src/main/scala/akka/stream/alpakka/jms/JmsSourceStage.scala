@@ -8,10 +8,10 @@ import akka.stream.{Attributes, Outlet, SourceShape}
 
 import scala.collection.mutable
 
-class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape[String]] {
+class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape[Message]] {
 
   val out = Outlet[String]("JmsSource.out")
-  override def shape: SourceShape[String] = SourceShape[String](out)
+  override def shape: SourceShape[Message] = SourceShape[Message](out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) with JmsConnector with StageLogging{
@@ -20,19 +20,19 @@ class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape
 
       var jmsConsumer: Option[MessageConsumer] = None
       private val bufferSize = settings.bufferSize
-      private val queue = mutable.Queue[String]()
+      private val queue = mutable.Queue[Message]()
       private val backpressure = new Semaphore(bufferSize)
 
       val handleError = getAsyncCallback[Throwable](e => {
         fail(out, e)
       })
 
-      val handleMessage = getAsyncCallback[String](text => {
+      val handleMessage = getAsyncCallback[Message](msg => {
         require(queue.size <= bufferSize)
         if (isAvailable(out)) {
-          pushMessage(text)
+          pushMessage(msg)
         } else {
-          queue.enqueue(text)
+          queue.enqueue(msg)
         }
       })
 
@@ -43,8 +43,8 @@ class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape
           }
       })
 
-      def pushMessage(text: String): Unit = {
-        push(out, text)
+      def pushMessage(msg: Message): Unit = {
+        push(out, msg)
         backpressure.release()
       }
 
@@ -61,8 +61,7 @@ class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape
                 backpressure.acquire()
                 try {
                   message.acknowledge()
-                  val text = message.asInstanceOf[TextMessage].getText
-                  handleMessage.invoke(text)
+                  handleMessage.invoke(message)
                 } catch {
                   case e: JMSException =>
                     backpressure.release()

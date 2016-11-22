@@ -33,7 +33,7 @@ class JmsConnectorsSpec extends JmsSpec {
       //#run-sink
 
       //#create-source
-      val jmsSource: Source[String, NotUsed] = JmsSource(
+      val jmsSource: Source[String, NotUsed] = JmsSource.textSource(
         JmsSourceSettings(connectionFactory, bufferSize = 10).withQueue("test")
       )
       //#create-source
@@ -53,7 +53,7 @@ class JmsConnectorsSpec extends JmsSpec {
       val in = List("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k")
       Source(in).runWith(JmsSink(JmsSinkSettings(connectionFactory).withQueue("test")))
 
-      val result = JmsSource(JmsSourceSettings(connectionFactory, bufferSize = 1).withQueue("test")).mapAsync(1)(e => akka.pattern.after(1.seconds, system.scheduler)(Future.successful(e)) ).take(in.size).runWith(Sink.seq)
+      val result = JmsSource.textSource(JmsSourceSettings(connectionFactory, bufferSize = 1).withQueue("test")).mapAsync(1)(e => akka.pattern.after(1.seconds, system.scheduler)(Future.successful(e)) ).take(in.size).runWith(Sink.seq)
 
       result.futureValue shouldEqual in
     }

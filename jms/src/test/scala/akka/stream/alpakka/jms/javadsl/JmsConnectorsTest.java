@@ -79,7 +79,7 @@ public class JmsConnectorsTest {
 
         //#create-source
         Source<String, NotUsed> jmsSource = JmsSource
-                .create(JmsSourceSettings
+                .textSource(JmsSourceSettings
                         .create(connectionFactory)
                         .withQueue("test")
                         .withBufferSize(10)
@@ -105,7 +105,7 @@ public class JmsConnectorsTest {
         ), materializer);
 
         CompletionStage<List<String>> result = JmsSource
-                .create(JmsSourceSettings
+                .textSource(JmsSourceSettings
                         .create(connectionFactory)
                         .withQueue("test")
                         .withBufferSize(1)
@@ -122,7 +122,7 @@ public class JmsConnectorsTest {
     public void deconnexionShouldFail() throws Exception {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61617");
 
-        CompletionStage<List<String>> result = JmsSource.create(JmsSourceSettings
+        CompletionStage<List<String>> result = JmsSource.textSource(JmsSourceSettings
                 .create(connectionFactory)
                 .withQueue("test")
                 .withBufferSize(1)

@@ -1,6 +1,6 @@
 package akka.stream.alpakka.jms.scaladsl
 
-import javax.jms.ConnectionFactory
+import javax.jms.{ConnectionFactory, Message, TextMessage}
 
 import akka.NotUsed
 import akka.stream.alpakka.jms.{JmsSourceSettings, JmsSourceStage}
@@ -11,9 +11,18 @@ object JmsSource {
   /**
     * Scala API: Creates an [[JmsSource]]
     * @param jmsSettings the connection settings
-    * @return
+    * @return a [[akka.stream.scaladsl.Source of jms [[javax.jms.Message]]
     */
-  def apply(jmsSettings: JmsSourceSettings): Source[String, NotUsed] =
+  def apply(jmsSettings: JmsSourceSettings): Source[Message, NotUsed] =
     Source.fromGraph(new JmsSourceStage(jmsSettings))
+
+
+  /**
+    * Scala API: Creates an [[JmsSource]]
+    * @param jmsSettings the connection settings
+    * @return a [[akka.stream.scaladsl.Source of [[java.lang.String]]
+    */
+  def textSource(jmsSettings: JmsSourceSettings): Source[String, NotUsed] =
+  Source.fromGraph(new JmsSourceStage(jmsSettings)).map(msg => msg.asInstanceOf[TextMessage].getText)
 
 }
