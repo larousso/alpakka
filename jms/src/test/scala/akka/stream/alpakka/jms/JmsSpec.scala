@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+ */
 package akka.stream.alpakka.jms
 
 import akka.actor.ActorSystem
@@ -7,13 +10,16 @@ import org.scalactic.source.Position
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 
-abstract class JmsSpec extends WordSpec with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with ScalaFutures {
+abstract class JmsSpec
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with ScalaFutures {
 
   implicit val system = ActorSystem(this.getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
   val broker = new BrokerService()
-
-
 
   override protected def beforeEach(): Unit = {
     broker.setPersistent(false)
@@ -23,14 +29,12 @@ abstract class JmsSpec extends WordSpec with Matchers with BeforeAndAfterAll wit
     broker.start()
   }
 
-  override protected def afterEach(): Unit = {
-    if(broker.isStarted) {
+  override protected def afterEach(): Unit =
+    if (broker.isStarted) {
       broker.stop()
     }
-  }
 
-  override protected def afterAll(): Unit ={
+  override protected def afterAll(): Unit =
     system.terminate()
-  }
 
 }

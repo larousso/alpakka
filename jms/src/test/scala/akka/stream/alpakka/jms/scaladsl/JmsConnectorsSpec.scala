@@ -1,10 +1,13 @@
+/*
+ * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+ */
 package akka.stream.alpakka.jms.scaladsl
 
 import javax.jms.JMSException
 
 import akka.NotUsed
-import akka.stream.alpakka.jms.{JmsSinkSettings, JmsSourceSettings, JmsSpec}
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.alpakka.jms.{ JmsSinkSettings, JmsSourceSettings, JmsSpec }
+import akka.stream.scaladsl.{ Sink, Source }
 import org.apache.activemq.ActiveMQConnectionFactory
 
 import scala.concurrent.Future
@@ -63,13 +66,12 @@ class JmsConnectorsSpec extends JmsSpec {
     }
 
     "deconnection should fail the stage" in {
-        val connectionFactory = new ActiveMQConnectionFactory(s"tcp://localhost:61616")
-        val result = JmsSource(JmsSourceSettings(connectionFactory).withQueue("test")).runWith(Sink.seq)
-        Thread.sleep(500)
-        broker.stop()
-        result.failed.futureValue shouldBe an[JMSException]
+      val connectionFactory = new ActiveMQConnectionFactory(s"tcp://localhost:61616")
+      val result = JmsSource(JmsSourceSettings(connectionFactory).withQueue("test")).runWith(Sink.seq)
+      Thread.sleep(500)
+      broker.stop()
+      result.failed.futureValue shouldBe an[JMSException]
     }
-
 
     "publish and consume elements through a topic " in {
       import system.dispatcher
@@ -107,7 +109,6 @@ class JmsConnectorsSpec extends JmsSpec {
       Source(in).runWith(jmsTopicSink)
       //#run-topic-sink
       Source(inNumbers).runWith(jmsTopicSink2)
-
 
       val expectedList: List[String] = in ++ inNumbers
       result1.futureValue shouldEqual expectedList.sorted

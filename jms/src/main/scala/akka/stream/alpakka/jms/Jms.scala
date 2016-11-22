@@ -6,9 +6,7 @@ package akka.stream.alpakka.jms
 import javax.jms
 import javax.jms._
 
-import akka.stream.stage.{GraphStageLogic, StageLogging}
-
-
+import akka.stream.stage.{ GraphStageLogic, StageLogging }
 
 trait JmsSettings {
   def connectionFactory: ConnectionFactory
@@ -26,7 +24,11 @@ object JmsSourceSettings {
 
 }
 
-case class JmsSourceSettings(connectionFactory: ConnectionFactory, destination: Option[Destination] = None, credentials: Option[Credentials] = None, bufferSize: Int = 100) extends JmsSettings {
+case class JmsSourceSettings(connectionFactory: ConnectionFactory,
+                             destination: Option[Destination] = None,
+                             credentials: Option[Credentials] = None,
+                             bufferSize: Int = 100)
+    extends JmsSettings {
   def withCredential(credentials: Credentials) = copy(credentials = Some(credentials))
   def withBufferSize(size: Int) = copy(bufferSize = size)
   def withQueue(name: String) = copy(destination = Some(Queue(name)))
@@ -39,7 +41,10 @@ object JmsSinkSettings {
 
 }
 
-case class JmsSinkSettings(connectionFactory: ConnectionFactory, destination: Option[Destination] = None, credentials: Option[Credentials] = None) extends JmsSettings {
+case class JmsSinkSettings(connectionFactory: ConnectionFactory,
+                           destination: Option[Destination] = None,
+                           credentials: Option[Credentials] = None)
+    extends JmsSettings {
   def withCredential(credentials: Credentials) = copy(credentials = Some(credentials))
   def withQueue(name: String) = copy(destination = Some(Queue(name)))
   def withTopic(name: String) = copy(destination = Some(Topic(name)))
@@ -47,8 +52,7 @@ case class JmsSinkSettings(connectionFactory: ConnectionFactory, destination: Op
 
 case class Credentials(username: String, password: String)
 
-
-trait JmsConnector  { this: GraphStageLogic with StageLogging =>
+trait JmsConnector { this: GraphStageLogic with StageLogging =>
 
   private[jms] var jmsConnection: Option[Connection] = None
   private[jms] var jmsSession: Option[Session] = None
@@ -117,11 +121,9 @@ trait JmsConnector  { this: GraphStageLogic with StageLogging =>
     }
   }
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     openQueue()
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     closeConnection()
-  }
 }

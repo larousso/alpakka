@@ -3,12 +3,12 @@
  */
 package akka.stream.alpakka.jms
 
-import javax.jms.{MessageProducer, TextMessage}
+import javax.jms.{ MessageProducer, TextMessage }
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, StageLogging}
-import akka.stream.{Attributes, Inlet, SinkShape}
+import akka.stream.stage.{ GraphStage, GraphStageLogic, InHandler, StageLogging }
+import akka.stream.{ Attributes, Inlet, SinkShape }
 
-class JmsSinkStage(settings: JmsSettings)  extends GraphStage[SinkShape[String]] {
+class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[String]] {
 
   val in = Inlet[String]("JmsSink.in")
 
