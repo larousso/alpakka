@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+ */
 package akka.stream.alpakka.jms.scaladsl
 
 import javax.jms.{ConnectionFactory, Message, TextMessage}
@@ -20,7 +23,7 @@ object JmsSource {
   /**
     * Scala API: Creates an [[JmsSource]]
     * @param jmsSettings the connection settings
-    * @return a [[akka.stream.scaladsl.Source of [[java.lang.String]]
+    * @return a [[akka.stream.scaladsl.Source of [[String]]
     */
   def textSource(jmsSettings: JmsSourceSettings): Source[String, NotUsed] =
   Source.fromGraph(new JmsSourceStage(jmsSettings)).map(msg => msg.asInstanceOf[TextMessage].getText)
