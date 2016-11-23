@@ -3,35 +3,31 @@
  */
 package akka.stream.alpakka.jms.javadsl;
 
-import static akka.pattern.PatternsCS.after;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import akka.NotUsed;
+import akka.actor.ActorSystem;
+import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
+import akka.stream.alpakka.jms.JmsSinkSettings;
+import akka.stream.alpakka.jms.JmsSourceSettings;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
+import akka.testkit.JavaTestKit;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.junit.*;
+import scala.concurrent.duration.FiniteDuration;
 
+import javax.jms.JMSException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.jms.JMSException;
-
-import akka.NotUsed;
-import akka.stream.alpakka.jms.JmsSinkSettings;
-import akka.stream.alpakka.jms.JmsSourceSettings;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.junit.*;
-
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
-import akka.stream.javadsl.Sink;
-import akka.stream.javadsl.Source;
-import akka.testkit.JavaTestKit;
-import scala.concurrent.duration.FiniteDuration;
+import static akka.pattern.PatternsCS.after;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class JmsConnectorsTest {
 

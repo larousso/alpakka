@@ -9,19 +9,22 @@ import akka.NotUsed
 import akka.stream.alpakka.jms.{ JmsSinkSettings, JmsSourceSettings, JmsSpec }
 import akka.stream.scaladsl.{ Sink, Source }
 import org.apache.activemq.ActiveMQConnectionFactory
+import org.apache.activemq.broker.BrokerService
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.util.Random
 
 class JmsConnectorsSpec extends JmsSpec {
 
   override implicit val patienceConfig = PatienceConfig(1.minute)
 
   "The JMS Connectors" should {
-    "publish and consume elements through a queue" in {
-
+    "publish and consume elements through a queue" in withServer() { ctx =>
+      val host: String = ctx.host
+      val port: Int = ctx.port
       //#connection-factory
-      val connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616")
+      val connectionFactory = new ActiveMQConnectionFactory(s"tcp://$host:$port")
       //#connection-factory
 
       //#create-sink
@@ -48,11 +51,10 @@ class JmsConnectorsSpec extends JmsSpec {
       result.futureValue shouldEqual in
     }
 
-    "applying backpressure when the consumer is slower than the producer" in {
-
+    "applying backpressure when the consumer is slower than the producer" in withServer() { ctx =>
       import system.dispatcher
 
-      val connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616")
+      val connectionFactory = new ActiveMQConnectionFactory(s"tcp://${ctx.host}:${ctx.port}")
       val in = List("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k")
       Source(in).runWith(JmsSink(JmsSinkSettings(connectionFactory).withQueue("test")))
 
@@ -65,18 +67,18 @@ class JmsConnectorsSpec extends JmsSpec {
       result.futureValue shouldEqual in
     }
 
-    "deconnection should fail the stage" in {
-      val connectionFactory = new ActiveMQConnectionFactory(s"tcp://localhost:61616")
+    "deconnection should fail the stage" in withServer() { ctx =>
+      val connectionFactory = new ActiveMQConnectionFactory(s"tcp://${ctx.host}:${ctx.port}")
       val result = JmsSource(JmsSourceSettings(connectionFactory).withQueue("test")).runWith(Sink.seq)
       Thread.sleep(500)
-      broker.stop()
+      ctx.broker.stop()
       result.failed.futureValue shouldBe an[JMSException]
     }
 
-    "publish and consume elements through a topic " in {
+    "publish and consume elements through a topic " in withServer() { ctx =>
       import system.dispatcher
 
-      val connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616")
+      val connectionFactory = new ActiveMQConnectionFactory(s"tcp://${ctx.host}:${ctx.port}")
 
       //#create-topic-sink
       val jmsTopicSink: Sink[String, NotUsed] = JmsSink(
