@@ -24,7 +24,7 @@ private[jms] trait JmsConnector { this: GraphStageLogic with StageLogging =>
 
   private[jms] def onSessionOpened(): Unit
 
-  private def fail = getAsyncCallback[JMSException](e => failStage(e))
+  private[jms] def fail = getAsyncCallback[JMSException](e => failStage(e))
 
   private def onSession =
     getAsyncCallback[JmsSession](session => {
