@@ -3,13 +3,14 @@
  */
 package akka.stream.alpakka.jms
 
-import javax.jms.{ MessageProducer, TextMessage }
+import javax.jms.{MessageProducer, TextMessage}
 
 import akka.Done
-import akka.stream.stage.{ GraphStage, GraphStageLogic, InHandler, StageLogging }
-import akka.stream.{ Attributes, Inlet, SinkShape }
+import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, StageLogging}
+import akka.stream.{Attributes, Inlet, SinkShape}
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[String]] {
 
@@ -42,7 +43,12 @@ final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[Str
           Future {
             val textMessage: TextMessage = jmsSession.session.createTextMessage(elem)
             jmsProducer.send(textMessage)
-          }.foreach(_ => askNext.invoke(Done))
+          }.onComplete {
+            case Success(_) => askNext.invoke(Done)
+            case Failure(e) =>
+              log.error(e, "Error sending message")
+              askNext.invoke(Done)
+          }
         }
       })
 
