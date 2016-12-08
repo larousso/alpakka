@@ -40,6 +40,10 @@ final class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[Sourc
         }
       })
 
+      override def preStart(): Unit = {
+        initSessionAsync()
+      }
+
       private def pushMessage(msg: Message): Unit = {
         push(out, msg)
         backpressure.release()
@@ -62,14 +66,7 @@ final class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[Sourc
               }
             })
           case Failure(e) =>
-            settings.destination match {
-              case Some(Queue(name)) =>
-                log.error(e, "Error creating consumer on queue {}", name)
-              case Some(Topic(name)) =>
-                log.error(e, "Error creating consumer on topic {}", name)
-              case _ =>
-            }
-            failStage(e)
+            fail.invoke(e)
         }
 
       setHandler(out, new OutHandler {

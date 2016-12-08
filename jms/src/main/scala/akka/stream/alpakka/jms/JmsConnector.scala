@@ -22,9 +22,9 @@ private[jms] trait JmsConnector { this: GraphStageLogic with StageLogging =>
 
   private[jms] def jmsSettings: JmsSettings
 
-  private[jms] def onSessionOpened(): Unit
+  private[jms] def onSessionOpened(): Unit = {}
 
-  private[jms] def fail = getAsyncCallback[Exception](e => failStage(e))
+  private[jms] def fail = getAsyncCallback[Throwable](e => failStage(e))
 
   private def onSession =
     getAsyncCallback[JmsSession](session => {
@@ -32,32 +32,37 @@ private[jms] trait JmsConnector { this: GraphStageLogic with StageLogging =>
       onSessionOpened()
     })
 
-  override def preStart(): Unit = {
+  private[jms] def initSessionAsync() = {
     ec = materializer match {
       case m: ActorMaterializer => m.system.dispatchers.lookup("akka.stream.default-blocking-io-dispatcher")
       case x => throw new IllegalArgumentException(s"Stage only works with the ActorMaterializer, was: $x")
     }
-    val factory = jmsSettings.connectionFactory
     Future {
-      val connection = jmsSettings.credentials match {
-        case Some(Credentials(username, password)) => factory.createConnection(username, password)
-        case _ => factory.createConnection()
-      }
-      connection.setExceptionListener(new ExceptionListener {
-        override def onException(exception: JMSException) =
-          fail.invoke(exception)
-      })
-      connection.start()
-      val session = connection.createSession(false, jms.Session.CLIENT_ACKNOWLEDGE)
-      val dest = jmsSettings.destination match {
-        case Some(Queue(name)) => session.createQueue(name)
-        case Some(Topic(name)) => session.createTopic(name)
-        case _ => throw new IllegalArgumentException("Destination is missing")
-      }
-      onSession.invoke(JmsSession(connection, session, dest))
+      val session = openSession()
+      onSession.invoke(session)
     }.onFailure {
       case e: Exception => fail.invoke(e)
     }
+  }
+
+  private[jms] def openSession(): JmsSession = {
+    val factory = jmsSettings.connectionFactory
+    val connection = jmsSettings.credentials match {
+      case Some(Credentials(username, password)) => factory.createConnection(username, password)
+      case _ => factory.createConnection()
+    }
+    connection.setExceptionListener(new ExceptionListener {
+      override def onException(exception: JMSException) =
+        fail.invoke(exception)
+    })
+    connection.start()
+    val session = connection.createSession(false, jms.Session.CLIENT_ACKNOWLEDGE)
+    val dest = jmsSettings.destination match {
+      case Some(Queue(name)) => session.createQueue(name)
+      case Some(Topic(name)) => session.createTopic(name)
+      case _ => throw new IllegalArgumentException("Destination is missing")
+    }
+    JmsSession(connection, session, dest)
   }
 
   override def postStop(): Unit =
