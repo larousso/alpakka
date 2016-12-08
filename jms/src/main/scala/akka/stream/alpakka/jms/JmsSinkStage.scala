@@ -38,7 +38,9 @@ final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[Str
         }
       })
 
-
+      override def postStop(): Unit = {
+        Option(jmsSession).foreach(_.closeSession())
+      }
     }
 
 }

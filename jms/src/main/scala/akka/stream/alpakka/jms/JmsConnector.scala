@@ -4,12 +4,12 @@
 package akka.stream.alpakka.jms
 
 import javax.jms
-import javax.jms.{ ExceptionListener, JMSException }
+import javax.jms.{ExceptionListener, JMSException}
 
 import akka.stream.ActorMaterializer
-import akka.stream.stage.{ GraphStageLogic, StageLogging }
+import akka.stream.stage.{GraphStageLogic, StageLogging}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Internal API
@@ -64,23 +64,21 @@ private[jms] trait JmsConnector { this: GraphStageLogic with StageLogging =>
     }
     JmsSession(connection, session, dest)
   }
-
-  override def postStop(): Unit =
-    Option(jmsSession).foreach(_.closeSession().onFailure {
-      case e => log.error(e, "Error closing connection")
-    })
 }
 
 private[jms] case class JmsSession(connection: jms.Connection, session: jms.Session, destination: jms.Destination) {
 
-  private[jms] def closeSession()(implicit ec: ExecutionContext): Future[Unit] =
+  private[jms] def closeSessionAsync()(implicit ec: ExecutionContext): Future[Unit] =
     Future {
+      closeSession()
+    }
+
+  private[jms] def closeSession(): Unit =
       try {
         session.close()
       } finally {
         connection.close()
       }
-    }
 
   private[jms] def createProducer()(implicit ec: ExecutionContext): Future[jms.MessageProducer] =
     Future {
