@@ -7,14 +7,14 @@ import javax.jms
 import javax.jms.{ExceptionListener, JMSException}
 
 import akka.stream.ActorMaterializer
-import akka.stream.stage.{GraphStageLogic, StageLogging}
+import akka.stream.stage.GraphStageLogic
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Internal API
  */
-private[jms] trait JmsConnector { this: GraphStageLogic with StageLogging =>
+private[jms] trait JmsConnector { this: GraphStageLogic =>
 
   implicit private[jms] var ec: ExecutionContext = _
 

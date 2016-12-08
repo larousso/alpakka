@@ -5,7 +5,7 @@ package akka.stream.alpakka.jms
 
 import javax.jms.{MessageProducer, TextMessage}
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, StageLogging}
+import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
 import akka.stream.{ActorAttributes, Attributes, Inlet, SinkShape}
 
 final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[String]] {
@@ -17,7 +17,7 @@ final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[Str
   override protected def initialAttributes: Attributes = ActorAttributes.dispatcher("akka.stream.default-blocking-io-dispatcher")
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
-    new GraphStageLogic(shape) with JmsConnector with StageLogging {
+    new GraphStageLogic(shape) with JmsConnector {
 
       private var jmsProducer: MessageProducer = _
 

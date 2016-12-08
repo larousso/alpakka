@@ -6,7 +6,7 @@ package akka.stream.alpakka.jms
 import java.util.concurrent.Semaphore
 import javax.jms._
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler, StageLogging}
+import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
 import akka.stream.{Attributes, Outlet, SourceShape}
 
 import scala.collection.mutable
@@ -19,7 +19,7 @@ final class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[Sourc
   override def shape: SourceShape[Message] = SourceShape[Message](out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
-    new GraphStageLogic(shape) with JmsConnector with StageLogging {
+    new GraphStageLogic(shape) with JmsConnector {
 
       override private[jms] def jmsSettings = settings
 
