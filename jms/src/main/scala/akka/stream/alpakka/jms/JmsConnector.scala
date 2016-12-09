@@ -4,12 +4,12 @@
 package akka.stream.alpakka.jms
 
 import javax.jms
-import javax.jms.{ExceptionListener, JMSException}
+import javax.jms.{ ExceptionListener, JMSException }
 
 import akka.stream.ActorMaterializer
 import akka.stream.stage.GraphStageLogic
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * Internal API
@@ -74,11 +74,11 @@ private[jms] case class JmsSession(connection: jms.Connection, session: jms.Sess
     }
 
   private[jms] def closeSession(): Unit =
-      try {
-        session.close()
-      } finally {
-        connection.close()
-      }
+    try {
+      session.close()
+    } finally {
+      connection.close()
+    }
 
   private[jms] def createProducer()(implicit ec: ExecutionContext): Future[jms.MessageProducer] =
     Future {

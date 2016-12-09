@@ -6,11 +6,11 @@ package akka.stream.alpakka.jms
 import java.util.concurrent.Semaphore
 import javax.jms._
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
-import akka.stream.{Attributes, Outlet, SourceShape}
+import akka.stream.stage.{ GraphStage, GraphStageLogic, OutHandler }
+import akka.stream.{ Attributes, Outlet, SourceShape }
 
 import scala.collection.mutable
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 final class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[SourceShape[Message]] {
 
@@ -40,9 +40,8 @@ final class JmsSourceStage(settings: JmsSourceSettings) extends GraphStage[Sourc
         }
       })
 
-      override def preStart(): Unit = {
+      override def preStart(): Unit =
         initSessionAsync()
-      }
 
       private def pushMessage(msg: Message): Unit = {
         push(out, msg)

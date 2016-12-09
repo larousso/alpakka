@@ -3,10 +3,10 @@
  */
 package akka.stream.alpakka.jms
 
-import javax.jms.{MessageProducer, TextMessage}
+import javax.jms.{ MessageProducer, TextMessage }
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler}
-import akka.stream.{ActorAttributes, Attributes, Inlet, SinkShape}
+import akka.stream.stage.{ GraphStage, GraphStageLogic, InHandler }
+import akka.stream.{ ActorAttributes, Attributes, Inlet, SinkShape }
 
 final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[String]] {
 
@@ -14,7 +14,8 @@ final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[Str
 
   override def shape: SinkShape[String] = SinkShape.of(in)
 
-  override protected def initialAttributes: Attributes = ActorAttributes.dispatcher("akka.stream.default-blocking-io-dispatcher")
+  override protected def initialAttributes: Attributes =
+    ActorAttributes.dispatcher("akka.stream.default-blocking-io-dispatcher")
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) with JmsConnector {
@@ -38,9 +39,8 @@ final class JmsSinkStage(settings: JmsSettings) extends GraphStage[SinkShape[Str
         }
       })
 
-      override def postStop(): Unit = {
+      override def postStop(): Unit =
         Option(jmsSession).foreach(_.closeSession())
-      }
     }
 
 }
