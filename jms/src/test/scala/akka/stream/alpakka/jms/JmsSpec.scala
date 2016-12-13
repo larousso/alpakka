@@ -10,8 +10,6 @@ import org.apache.activemq.broker.BrokerService
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 
-import scala.util.Random
-
 abstract class JmsSpec
     extends WordSpec
     with Matchers
@@ -24,8 +22,6 @@ abstract class JmsSpec
 
   override protected def afterAll(): Unit =
     TestKit.shutdownActorSystem(system)
-
-  val random = Random
 
   def withServer(network: Boolean = true)(test: Context => Unit): Unit = {
     val broker = new BrokerService()
