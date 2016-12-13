@@ -31,7 +31,7 @@ abstract class JmsSpec
     val broker = new BrokerService()
     val host: String = "localhost"
     val url = if (network) {
-      val port = random.nextInt(499) + 6000
+      val port = akka.testkit.SocketUtil.temporaryServerAddress(host).getPort
       val serverUrl = s"tcp://$host:$port"
       broker.addConnector(serverUrl)
       serverUrl
