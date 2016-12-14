@@ -64,4 +64,10 @@ object Dependencies {
       "ch.qos.logback"        % "logback-core"         % "1.1.7"    % Test  // Eclipse Public License 1.0
     )
   )
+
+  val Elasticsearch = Seq(
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-http"     % AkkaHttpVersion
+    )
+  )
 }

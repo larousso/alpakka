@@ -51,6 +51,14 @@ lazy val ftp = project
     parallelExecution in Test := false
   )
 
+lazy val elasticsearch = project
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(
+    name := "akka-stream-alpakka-elasticsearch",
+    Dependencies.Elasticsearch,
+    parallelExecution in Test := false
+  )
+
 lazy val docs = project
   .enablePlugins(ParadoxPlugin, NoPublish)
   .disablePlugins(BintrayPlugin)
