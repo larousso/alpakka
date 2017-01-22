@@ -63,11 +63,11 @@ private[jms] trait JmsConnector { this: GraphStageLogic =>
       case Some(Topic(name)) => session.createTopic(name)
       case _ => throw new IllegalArgumentException("Destination is missing")
     }
-    JmsSession(connection, session, dest)
+    JmsSession(connection, session, dest, jmsSettings.selectors)
   }
 }
 
-private[jms] case class JmsSession(connection: jms.Connection, session: jms.Session, destination: jms.Destination) {
+private[jms] case class JmsSession(connection: jms.Connection, session: jms.Session, destination: jms.Destination, selectors: Option[String]) {
 
   private[jms] def closeSessionAsync()(implicit ec: ExecutionContext): Future[Unit] =
     Future {
@@ -88,6 +88,8 @@ private[jms] case class JmsSession(connection: jms.Connection, session: jms.Sess
 
   private[jms] def createConsumer()(implicit ec: ExecutionContext): Future[jms.MessageConsumer] =
     Future {
-      session.createConsumer(destination)
+      selectors
+        .map(s => session.createConsumer(destination, s))
+        .getOrElse(session.createConsumer(destination))
     }
 }

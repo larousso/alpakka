@@ -9,6 +9,7 @@ sealed trait JmsSettings {
   def connectionFactory: ConnectionFactory
   def destination: Option[Destination]
   def credentials: Option[Credentials]
+  def selectors: Option[String]
 }
 
 sealed trait Destination
@@ -24,12 +25,14 @@ object JmsSourceSettings {
 final case class JmsSourceSettings(connectionFactory: ConnectionFactory,
                                    destination: Option[Destination] = None,
                                    credentials: Option[Credentials] = None,
+                                   selectors: Option[String] = None,
                                    bufferSize: Int = 100)
     extends JmsSettings {
   def withCredential(credentials: Credentials) = copy(credentials = Some(credentials))
   def withBufferSize(size: Int) = copy(bufferSize = size)
   def withQueue(name: String) = copy(destination = Some(Queue(name)))
   def withTopic(name: String) = copy(destination = Some(Topic(name)))
+  def withSelectors(selectors: String) = copy(selectors = Some(selectors))
 }
 
 object JmsSinkSettings {
@@ -40,7 +43,8 @@ object JmsSinkSettings {
 
 final case class JmsSinkSettings(connectionFactory: ConnectionFactory,
                                  destination: Option[Destination] = None,
-                                 credentials: Option[Credentials] = None)
+                                 credentials: Option[Credentials] = None,
+                                 selectors: Option[String] = None)
     extends JmsSettings {
   def withCredential(credentials: Credentials) = copy(credentials = Some(credentials))
   def withQueue(name: String) = copy(destination = Some(Queue(name)))

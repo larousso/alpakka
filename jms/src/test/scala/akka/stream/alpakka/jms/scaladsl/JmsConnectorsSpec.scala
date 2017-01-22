@@ -3,7 +3,8 @@
  */
 package akka.stream.alpakka.jms.scaladsl
 
-import javax.jms.JMSException
+import javax.jms
+import javax.jms.{JMSException, Message}
 
 import akka.NotUsed
 import akka.stream.ThrottleMode
@@ -46,6 +47,38 @@ class JmsConnectorsSpec extends JmsSpec {
       //#run-source
 
       result.futureValue shouldEqual in
+    }
+
+    "publish and consume elements through a queue with selector" in withServer() { ctx =>
+
+      val url: String = ctx.url
+      val connectionFactory = new ActiveMQConnectionFactory(url)
+      val connection = connectionFactory.createConnection()
+      val session = connection.createSession(false, jms.Session.CLIENT_ACKNOWLEDGE)
+      val queue = session.createQueue("test")
+      val producer = session.createProducer(queue)
+      try {
+        val jmsSource: Source[String, NotUsed] = JmsSource.textSource(
+          JmsSourceSettings(connectionFactory).withBufferSize(10).withQueue("test").withSelectors("test='a'")
+        )
+        Thread.sleep(500)
+
+        val message1 = session.createTextMessage("1")
+        message1.setStringProperty("test", "a")
+        producer.send(message1)
+        val message2 = session.createTextMessage("2")
+        message2.setStringProperty("test", "b")
+        producer.send(message2)
+        val message3 = session.createTextMessage("3")
+        message3.setStringProperty("test", "a")
+        producer.send(message3)
+
+        val result = jmsSource.take(2).runWith(Sink.seq)
+
+        result.futureValue shouldEqual Seq("1", "3")
+      } finally {
+        connection.close()
+      }
     }
 
     "applying backpressure when the consumer is slower than the producer" in withServer() { ctx =>
